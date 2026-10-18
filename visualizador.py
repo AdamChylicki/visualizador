@@ -131,7 +131,7 @@ def visualizar_csv2(archivo):
     except (OSError, pd.errors.ParserError, UnicodeDecodeError) as error:
         print(f"Error al leer el archivo CSV: {error}")
 
-def visualizar_csv1(archivo):
+def visualizar_csv_matplot(archivo):
     """
     Lee un archivo CSV y representa sus columnas numéricas en una gráfica.
     """
@@ -171,7 +171,9 @@ def visualizar_csv1(archivo):
         # Crear una única gráfica con dos escalas verticales
         plt.style.use("dark_background")
 
-        fig, ax1 = plt.subplots(figsize=(12, 6))
+        # --------------------------------------------------------------------
+
+        fig, ax1 = plt.subplots(figsize=(7, 5))
 
         # Eje izquierdo: módulo de impedancia
         ax1.plot(
@@ -214,6 +216,56 @@ def visualizar_csv1(archivo):
 
         ax1.set_title("Módulos de impedancia y admitancia")
         fig.patch.set_facecolor("black")
+
+        # --------------------------------------------------------------------
+        
+        fig2, ax3 = plt.subplots(figsize=(7, 5))
+
+        # Eje izquierdo: módulo de impedancia
+        ax3.plot(
+            datos.index,
+            datos["realZ_Ohm"],
+            color="deepskyblue",
+            linewidth=1.5,
+            label="realZ_Ohm"
+        )
+
+        ax3.set_xlabel("Frecuencia (Hz)")
+        ax3.set_ylabel("realZ_Ohm", color="deepskyblue")
+        ax3.tick_params(axis="y", labelcolor="deepskyblue")
+        ax3.set_facecolor("black")
+        ax3.grid(True, color="gray", alpha=0.3)
+
+        # Eje derecho: módulo de admitancia
+        ax4 = ax3.twinx()
+
+        ax4.plot(
+            datos.index,
+            datos["imagZ_Ohm"],
+            color="orange",
+            linewidth=1.5,
+            label="imagZ_Ohm"
+        )
+
+        ax4.set_ylabel("imagZ_Ohm", color="orange")
+        ax4.tick_params(axis="y", labelcolor="orange")
+
+        # Unificar las leyendas
+        lineas3, etiquetas3 = ax3.get_legend_handles_labels()
+        lineas4, etiquetas4 = ax4.get_legend_handles_labels()
+
+        ax3.legend(
+            lineas3 + lineas4,
+            etiquetas3 + etiquetas4,
+            loc="best"
+        )
+
+        ax1.set_title("abs Z, abs Y")
+        ax3.set_title("Re Z, Im Z")
+        fig.patch.set_facecolor("black")
+
+        fig.canvas.manager.window.move(0, 0)
+        fig2.canvas.manager.window.move(750, 0)
 
         plt.tight_layout()
         plt.show()
@@ -266,13 +318,16 @@ def seleccionar_carpeta():
     return Path(carpeta)
 
 
+# --------------------------- main -------------------------------
+
+
 print("Iniciando visualizador...")
 
 # Ejemplo de uso
 archivo = seleccionar_archivo_csv()
 
 if archivo:
-    visualizar_csv1(archivo)
+    visualizar_csv_matplot(archivo)
 
 
 
